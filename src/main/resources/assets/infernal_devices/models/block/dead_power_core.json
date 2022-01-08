@@ -1,0 +1,27 @@
+{
+    "parent": "minecraft:block/block",
+    "elements": [
+      {
+        "from": [ 0, 0, 0 ],
+        "to": [ 16, 16, 16 ],
+        "faces": {
+          "down":  { "texture": "#down", "cullface": "down", "rotation": 270 },
+          "up":    { "texture": "#up", "cullface": "up" },
+          "north": { "texture": "#north", "cullface": "north" },
+          "south": { "texture": "#south", "cullface": "south" },
+          "west":  { "texture": "#west", "cullface": "west" },
+          "east":  { "texture": "#east", "cullface": "east" }
+        }
+      }
+  ],
+  "textures": {
+      "south": "infernal_devices:block/dead_power_core",
+      "east": "infernal_devices:block/dead_power_core_flipped",
+      "up": "infernal_devices:block/dead_power_core_top",
+      "down": "infernal_devices:block/dead_power_core_top",
+      "north": "infernal_devices:block/dead_power_core_flipped",
+      "west": "infernal_devices:block/dead_power_core",
+      "particle":"infernal_devices:block/dead_power_core_flipped"
+  }
+
+}

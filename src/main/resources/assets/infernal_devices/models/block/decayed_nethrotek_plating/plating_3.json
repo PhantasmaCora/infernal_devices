@@ -1,0 +1,6 @@
+    {
+      "parent": "block/cube_all",
+      "textures": {
+        "all": "infernal_devices:block/decayed_nethrotek_plating/decayed_plating_2"
+      }
+    }

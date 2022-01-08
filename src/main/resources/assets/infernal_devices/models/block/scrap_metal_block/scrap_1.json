@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "infernal_devices:block/scrap_metal_block/scrap_1_top",
+    "side": "infernal_devices:block/scrap_metal_block/scrap_1_side"
+  }
+}

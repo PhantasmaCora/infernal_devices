@@ -1,0 +1,15 @@
+{
+  "variants": {
+    "": [
+        { "model": "infernal_devices:block/decayed_nethrotek_plating/plating_0" },
+        { "model": "infernal_devices:block/decayed_nethrotek_plating/plating_0", "y": 180 },
+        { "model": "infernal_devices:block/decayed_nethrotek_plating/plating_2"},
+        { "model": "infernal_devices:block/decayed_nethrotek_plating/plating_2", "x": 90 },
+        { "model": "infernal_devices:block/decayed_nethrotek_plating/plating_2", "x": 90, "y": 90 },
+        { "model": "infernal_devices:block/decayed_nethrotek_plating/plating_1" },
+        { "model": "infernal_devices:block/decayed_nethrotek_plating/plating_1", "y": 180 },
+        { "model": "infernal_devices:block/decayed_nethrotek_plating/plating_3" },
+        { "model": "infernal_devices:block/decayed_nethrotek_plating/plating_3", "y": 180 }
+    ]
+  }
+}

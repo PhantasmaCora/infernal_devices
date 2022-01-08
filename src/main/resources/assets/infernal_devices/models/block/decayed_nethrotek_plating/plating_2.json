@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "infernal_devices:block/decayed_nethrotek_plating/decayed_plating_0",
+    "side": "infernal_devices:block/decayed_nethrotek_plating/decayed_plating_base"
+  }
+}
