@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column_horizontal",
+  "textures": {
+    "end": "infernal_devices:block/ember_stone_top",
+    "side": "infernal_devices:block/ember_stone_side"
+  }
+}

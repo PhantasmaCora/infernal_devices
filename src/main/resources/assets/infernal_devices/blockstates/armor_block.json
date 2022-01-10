@@ -1,0 +1,17 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "infernal_devices:block/armor_block",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "infernal_devices:block/armor_block",
+      "z": 90
+    },
+    "axis=z": {
+      "model": "infernal_devices:block/armor_block",
+      "x": 90
+    }
+  }
+}

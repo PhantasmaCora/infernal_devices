@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "infernal_devices:block/power_core",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "infernal_devices:block/power_core",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "infernal_devices:block/power_core"
+    },
+    "facing=west": {
+      "model": "infernal_devices:block/power_core",
+      "y": 90
+    }
+  }
+}
