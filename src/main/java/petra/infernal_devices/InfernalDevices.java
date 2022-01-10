@@ -70,7 +70,7 @@ public class InfernalDevices implements ModInitializer {
 	public static final Block SCRAP_METAL_BLOCK = new Block(SCRAP);
 	
 	private static final FabricBlockSettings DPC = FabricBlockSettings.of(Material.METAL).sounds(BlockSoundGroup.METAL).requiresTool().strength(1.2f, 4.0f);
-	public static final Block DEAD_POWER_CORE = new MyHorizontalFacingBlock(DPC);
+	public static final Block DEAD_POWER_CORE = new DeadPowerCoreBlock(DPC);
 	
 	private static final FabricBlockSettings LPC = FabricBlockSettings.of(Material.METAL).sounds(BlockSoundGroup.METAL).requiresTool().strength(1.5f, 0.8f);
 	public static final Block POWER_CORE = new MyHorizontalFacingBlock(LPC);
