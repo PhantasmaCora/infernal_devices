@@ -12,7 +12,6 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.*;
-import net.fabricmc.fabric.api.structure.v1.FabricStructureBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.GlassBlock;
@@ -32,7 +31,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.intprovider.ConstantIntProvider;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
-import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.biome.Biome;
@@ -44,18 +42,23 @@ import net.minecraft.world.gen.carver.ConfiguredCarvers;
 import net.minecraft.world.gen.decorator.HeightRangePlacementModifier;
 import net.minecraft.world.gen.decorator.RandomOffsetPlacementModifier;
 import net.minecraft.world.gen.decorator.SquarePlacementModifier;
-import net.minecraft.world.gen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.gen.decorator.BiomePlacementModifier;
+import net.minecraft.world.gen.decorator.CountMultilayerPlacementModifier;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.DeltaFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.PlacedFeature;
 import net.minecraft.world.gen.feature.PlacedFeatures;
 import net.minecraft.world.gen.feature.DefaultFeatureConfig;
 import net.minecraft.world.gen.feature.RandomPatchFeatureConfig;
 import net.minecraft.world.gen.feature.SimpleBlockFeatureConfig;
 import net.minecraft.world.gen.feature.SingleStateFeatureConfig;
+import net.minecraft.world.gen.feature.TreeFeatureConfig;
+import net.minecraft.world.gen.feature.size.TwoLayersFeatureSize;
+import net.minecraft.world.gen.foliage.RandomSpreadFoliagePlacer;
 import net.minecraft.world.gen.feature.SpringFeatureConfig;
-import net.minecraft.world.gen.feature.StructureFeature;
-import net.minecraft.world.gen.feature.StructurePoolFeatureConfig;
 import net.minecraft.world.gen.stateprovider.SimpleBlockStateProvider;
+import net.minecraft.world.gen.trunk.StraightTrunkPlacer;
 import ru.bclib.api.biomes.BCLBiomeBuilder;
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.api.features.BCLFeatureBuilder;
@@ -104,6 +107,10 @@ public class InfernalDevices implements ModInitializer {
 	public static final Block SLUDGE = new SludgeBlock(STILL_SLUDGE, FabricBlockSettings.copy(Blocks.LAVA).luminance( state -> 3 ));
 	public static final Item SLUDGE_BUCKET = new BucketItem(STILL_SLUDGE, new FabricItemSettings().group(ItemGroup.MISC).recipeRemainder(Items.BUCKET).maxCount(1));
 	
+	private static final FabricBlockSettings STEELWOOD = FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).mapColor(MapColor.IRON_GRAY).strength(2.6f, 2.6f);
+	
+	public static final Block STEELWOOD_LOG = new PillarBlock(STEELWOOD);
+	public static final Block STEELWOOD_SAPLING = new MySaplingBlock(new SteelwoodSaplingGenerator(), FabricBlockSettings.copyOf(Blocks.OAK_SAPLING));
 	
 	static HashMap<String, Block> basic_blocks = new HashMap<String, Block>();
 	
@@ -179,6 +186,22 @@ public class InfernalDevices implements ModInitializer {
 			.onlyInBiome()
 			.build(new DefaultFeatureConfig());
 	
+	public static final ConfiguredFeature<?, ?> TREE_STEELWOOD = Feature.TREE
+		// Configure the feature using the builder
+		.configure(new TreeFeatureConfig.Builder(
+		SimpleBlockStateProvider.of(STEELWOOD_LOG.getDefaultState()), // Trunk block provider
+		new StraightTrunkPlacer(8, 3, 0), // places a straight trunk
+		SimpleBlockStateProvider.of(STEELWOOD_LOG.getDefaultState()), // Foliage block provider
+		new RandomSpreadFoliagePlacer(ConstantIntProvider.create(5), ConstantIntProvider.create(0), ConstantIntProvider.create(2), 10), // places leaves as a blob (radius, offset from trunk, height)
+		new TwoLayersFeatureSize(1, 0, 1) // The width of the tree at different layers; used to see how tall the tree can be without clipping into blocks
+	) .ignoreVines()
+	.build());
+			  
+	public static final PlacedFeature TREE_STEELWOOD_PLACED = TREE_STEELWOOD.withPlacement(
+		CountMultilayerPlacementModifier.of(5),
+		BiomePlacementModifier.of()
+	);
+	
 	
 	//private static final StructureFeature<StructurePoolFeatureConfig> FACTORY_ONE = new FactoryOneFeature(StructurePoolFeatureConfig.CODEC, true, (object) -> true );
 	//public static final ConfiguredStructureFeature<?,?> FACTORY_ONE_CONFIGURED = FACTORY_ONE.configure( new StructurePoolFeatureConfig( () -> BuiltinRegistries.STRUCTURE_POOL.get(new Identifier(MODID, "bases")), 5 ) );
@@ -190,6 +213,8 @@ public class InfernalDevices implements ModInitializer {
 	//public static final BCLBiome BCL_THICKET = makeIronThicket();
 	
 	public static final BCLBiome BCL_FACTORY = makeFactory();
+	
+	public static final BCLBiome BCL_STEELWOODS = makeSteelwoods();
 	
 
 	
@@ -214,6 +239,7 @@ public class InfernalDevices implements ModInitializer {
 		basic_blocks.put("ember_panel", EMBER_PANEL);
 		basic_blocks.put("armor_block", ARMOR_BLOCK);
 		basic_blocks.put("armor_smooth", ARMOR_SMOOTH);
+		basic_blocks.put("steelwood_log", STEELWOOD_LOG);
     	
     	// Actually do the registration
     	Set<Entry<String, Block>> es = basic_blocks.entrySet();
@@ -237,6 +263,7 @@ public class InfernalDevices implements ModInitializer {
     	//BiomeAPI.registerSubBiome(BCL_SCRAPHEAP, BCL_THICKET);
     	
     	BiomeAPI.registerNetherBiome(BCL_FACTORY);
+    	BiomeAPI.registerNetherBiome(BCL_STEELWOODS);
 
     	// Modify biomes
     	RegistryKey<Biome> sh = RegistryKey.of(Registry.BIOME_KEY, new Identifier(MODID, "scrap_heap"));
@@ -258,6 +285,11 @@ public class InfernalDevices implements ModInitializer {
 		//BiomeModifications.addFeature(BiomeSelectors.includeByKey( it ), GenerationStep.Feature.UNDERGROUND_DECORATION, RegistryKey.of(Registry.PLACED_FEATURE_KEY, new Identifier("minecraft", "spring_open")));
 		//BiomeModifications.addFeature(BiomeSelectors.includeByKey( it ), GenerationStep.Feature.UNDERGROUND_DECORATION, RegistryKey.of(Registry.PLACED_FEATURE_KEY, new Identifier("minecraft", "spring_closed")));
 		//BiomeModifications.addFeature(BiomeSelectors.includeByKey( it ), GenerationStep.Feature.UNDERGROUND_DECORATION, RegistryKey.of(Registry.PLACED_FEATURE_KEY, new Identifier("minecraft", "glowstone")));
+		
+		RegistryKey<Biome> sw = RegistryKey.of(Registry.BIOME_KEY, new Identifier(MODID, "steelwood_forest"));
+		BiomeModifications.addFeature(BiomeSelectors.includeByKey( sw ), GenerationStep.Feature.UNDERGROUND_DECORATION, RegistryKey.of(Registry.PLACED_FEATURE_KEY, new Identifier("minecraft", "spring_open")));
+		BiomeModifications.addFeature(BiomeSelectors.includeByKey( sw ), GenerationStep.Feature.UNDERGROUND_DECORATION, RegistryKey.of(Registry.PLACED_FEATURE_KEY, new Identifier("minecraft", "spring_closed")));
+		BiomeModifications.addFeature(BiomeSelectors.includeByKey( sw ), GenerationStep.Feature.UNDERGROUND_DECORATION, RegistryKey.of(Registry.PLACED_FEATURE_KEY, new Identifier("minecraft", "glowstone")));
 
 	}
 	
@@ -389,6 +421,30 @@ public class InfernalDevices implements ModInitializer {
 			.surface(EMBER_STONE, EMBER_STONE, 2)
 			.feature(PLATFORM_CONF)
 			//.structure(FACTORY_ONE_CONFIGURED)
+			.build();
+	}
+	
+	private static BCLBiome makeSteelwoods() {
+		return BCLBiomeBuilder.start(new Identifier(MODID, "steelwood_forest"))
+			.precipitation(Precipitation.NONE)
+			.category(Category.NETHER)
+			.temperature(2.0f)
+			.wetness(0.0f)
+			.spawn(EntityType.STRIDER, 60, 1, 2)
+			.spawn(EntityType.GHAST, 20, 2, 4)
+			.skyColor(255, 64, 2)
+			.fogColor(134, 96, 29)
+			.genChance(1.0f)
+			.waterAndFogColor(255, 64, 2)
+			.plantsColor(184, 196, 64)
+			.music(MusicType.createIngameMusic(SoundEvents.MUSIC_NETHER_CRIMSON_FOREST))
+			.loop(SoundEvents.AMBIENT_SOUL_SAND_VALLEY_LOOP)
+			.mood(SoundEvents.AMBIENT_NETHER_WASTES_MOOD)
+			.additions(SoundEvents.AMBIENT_NETHER_WASTES_ADDITIONS)
+			.netherDefaultOres()
+			.carver(GenerationStep.Carver.AIR, ConfiguredCarvers.NETHER_CAVE)
+			.surface(Blocks.NETHERRACK)
+			.feature(GenerationStep.Feature.SURFACE_STRUCTURES, TREE_STEELWOOD_PLACED)
 			.build();
 	}
 
